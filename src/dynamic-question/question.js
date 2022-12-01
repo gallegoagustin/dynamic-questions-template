@@ -260,87 +260,87 @@ const Question = (qdata) => {
                     <DragDropContext onDragEnd={onDragEnd}>
                         <Droppable droppableId="droppable">
                             {(provided, snapshot) => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                                style={getListStyle(snapshot.isDraggingOver)}
-                            >
-                                {questionData.values.map((question, index) => (
-                                    <>
-                                    <Draggable key={index} draggableId={`${question.order}`} index={index}>
-                                        {(provided, snapshot) => (
-                                            <div
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            ref={provided.innerRef}
-                                            style={getItemStyle(
-                                                snapshot.isDragging,
-                                                provided.draggableProps.style
-                                              )}
-                                            >
-                                            <div id={index} key={index}>
-                                                <div className={index % 2 === 0 ? 'evenRow commonSpace' : 'oddRow commonSpace'} id={index} key={index}>
-                                                    <div style={{width: '5%'}}><img src='./dynamic-question/assets/drag-grey.svg' /></div>
-                                                    <input 
-                                                        disabled={!inputActive.values[index]}
-                                                        type='text' placeholder={'Insert value'}
-                                                        value={inputRecord.values[index]}
-                                                        name='value'
-                                                        onChange={(e) => {
-                                                            const newValues = [...inputRecord.values];
-                                                            newValues[index] = e.target.value;
-                                                            setInputRecord({...inputRecord, values: newValues});
-                                                        }}
-                                                        style={{width: '85%'}}
-                                                    />
-                                                    <div className='commonSpace-buttons' style={{width: '10%'}}>
-                                                        {nestLevel <= 2 && !question.conditional && (
-                                                            <div style={{ marginRight: '3px' }} onClick={() => addQuestion(index)}><img src='./dynamic-question/assets/plus-grey.svg' /></div>
-                                                        )}
-                                                        {!inputActive.values[index] && <div
-                                                            style={{ marginRight: '3px' }}
-                                                            disabled={qdata.state.isEditing}
+                                <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    style={getListStyle(snapshot.isDraggingOver)}
+                                >
+                                    {questionData.values.map((question, index) => (
+                                        <>
+                                        <Draggable key={index} draggableId={`${question.order}`} index={index}>
+                                            {(provided, snapshot) => (
+                                                <div
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                ref={provided.innerRef}
+                                                style={getItemStyle(
+                                                    snapshot.isDragging,
+                                                    provided.draggableProps.style
+                                                )}
+                                                >
+                                                <div id={index} key={index}>
+                                                    <div className={index % 2 === 0 ? 'evenRow commonSpace' : 'oddRow commonSpace'} id={index} key={index}>
+                                                        <div style={{width: '5%'}}><img src='./dynamic-question/assets/drag-grey.svg' /></div>
+                                                        <input 
+                                                            disabled={!inputActive.values[index]}
+                                                            type='text' placeholder={'Insert value'}
+                                                            value={inputRecord.values[index]}
+                                                            name='value'
+                                                            onChange={(e) => {
+                                                                const newValues = [...inputRecord.values];
+                                                                newValues[index] = e.target.value;
+                                                                setInputRecord({...inputRecord, values: newValues});
+                                                            }}
+                                                            style={{width: '85%'}}
+                                                        />
+                                                        <div className='commonSpace-buttons' style={{width: '10%'}}>
+                                                            {nestLevel <= 2 && !question.conditional && (
+                                                                <div style={{ marginRight: '3px' }} onClick={() => addQuestion(index)}><img src='./dynamic-question/assets/plus-grey.svg' /></div>
+                                                            )}
+                                                            {!inputActive.values[index] && <div
+                                                                style={{ marginRight: '3px' }}
+                                                                disabled={qdata.state.isEditing}
+                                                                    onClick={() => {
+                                                                        const newValues = inputActive.values.map(() => false);
+                                                                        newValues[index] = true;
+                                                                        toggleActiveInputs('values', newValues);
+                                                                    }}><img src='./dynamic-question/assets/pen-grey.svg' />
+                                                                </div>}
+                                                            {inputActive.values[index] && <div
+                                                                style={{ marginRight: '3px' }}
                                                                 onClick={() => {
-                                                                    const newValues = inputActive.values.map(() => false);
-                                                                    newValues[index] = true;
-                                                                    toggleActiveInputs('values', newValues);
-                                                                }}><img src='./dynamic-question/assets/pen-grey.svg' />
+                                                                    handleValueLabel(inputRecord.values[index], index);
+                                                                    const newValues = [...inputActive.values];
+                                                                    newValues[index] = false;
+                                                                    setInputActive({...inputActive, values: newValues});
+                                                                }}><img src='./dynamic-question/assets/save-grey.svg' />
                                                             </div>}
-                                                        {inputActive.values[index] && <div
-                                                            style={{ marginRight: '3px' }}
-                                                            onClick={() => {
-                                                                handleValueLabel(inputRecord.values[index], index);
-                                                                const newValues = [...inputActive.values];
-                                                                newValues[index] = false;
-                                                                setInputActive({...inputActive, values: newValues});
-                                                            }}><img src='./dynamic-question/assets/save-grey.svg' />
-                                                        </div>}
-                                                        <div onClick={() => removeValue(index)} style={{ marginRight: '3px' }}><img src='./dynamic-question/assets/trash-grey.svg' /></div>
+                                                            <div onClick={() => removeValue(index)} style={{ marginRight: '3px' }}><img src='./dynamic-question/assets/trash-grey.svg' /></div>
+                                                        </div>
                                                     </div>
-                                                </div>
 
+                                                </div>
                                             </div>
+                                            )}
+                                        </Draggable>
+                                        <div>
+                                            {question.conditional && (
+                                                <Question
+                                                    key={`${index}-${nestLevel}`}
+                                                    {...question.question}
+                                                    position={index}
+                                                    updateFunc={onUpdateDispatch}
+                                                    level={nestLevel}
+                                                    state={qdata.state}
+                                                    dispatch={qdata.dispatch}
+                                                    removeCondition={removeCondition}
+                                                />
+                                            )}
                                         </div>
-                                        )}
-                                    </Draggable>
-                                    <div>
-                                        {question.conditional && (
-                                            <Question
-                                                key={`${index}-${nestLevel}`}
-                                                {...question.question}
-                                                position={index}
-                                                updateFunc={onUpdateDispatch}
-                                                level={nestLevel}
-                                                state={qdata.state}
-                                                dispatch={qdata.dispatch}
-                                                removeCondition={removeCondition}
-                                            />
-                                        )}
+                                        </>
+                                        ))}
+                                        
                                     </div>
-                                    </>
-                                    ))}
-                                    
-                                </div>
                                 )}
                         </Droppable>
                     </DragDropContext>
