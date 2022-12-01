@@ -2,7 +2,7 @@ import React from 'preact/compat';
 import { useReducer, useState, useEffect } from "preact/hooks";
 import { reducer, initialState } from "./state.js";
 import Question from './question.js';
-import './styles/index.css';
+import './index.css';
 
 const DynamicQuestion = () => {
     const nestLevel = 0;
