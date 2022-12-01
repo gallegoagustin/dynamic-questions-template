@@ -8,5 +8,5 @@ export const emptySection = {
     label: '',
     question: '',
     type: 'multiple',
-    values: []
+    values: [],
 };
