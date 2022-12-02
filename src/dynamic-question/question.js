@@ -248,10 +248,16 @@ const Question = (qdata) => {
                             handleLabel(inputRecord.label);
                             setInputActive({...inputActive, label: false});
                         }}><img src='./dynamic-question/assets/save-white.svg' /></div>}
-                        <div><img src='./dynamic-question/assets/icons-white.svg' onClick={() => {
-                            qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
-                            questionData.updateFunc(newdq, questionData.position);
-                        }} /></div>
+                        <div>
+                            <img
+                                src='./dynamic-question/assets/icons-white.svg'
+                                onClick={() => {
+                                    qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
+                                    questionData.updateFunc(newdq, questionData.position);
+                                }}
+                                style={qdata.state.nestLevelActiveValue === nestLevel ? 'cursor: not-allowed' : ''}
+                            />
+                        </div>
                         {qdata.level !== 0 && !inputActive.label && <div className='pointer'  onClick={() => qdata.removeCondition(qdata.position)}><img src='./dynamic-question/assets/trash-white.svg' /></div>}
                     </div>
                 </div>
