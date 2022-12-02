@@ -234,7 +234,7 @@ const Question = (qdata) => {
     return (
         <div className={qdata.level === 0 ? 'containerQuestion' : 'captionQuestion'}>
             <div>
-                <div className={'headerQuestion commonSpace'} style={qdata.level !== 0 ? {marginTop: '3px'} : null}>
+                <div className={!inputActive.question ? 'headerQuestion commonSpace' : 'headerQuestionActive commonSpace'} style={qdata.level !== 0 ? {marginTop: '3px'} : null}>
                     {qdata.level === 0 && <input disabled={!inputActive.question} type='text' placeholder={'Insert question'} value={inputRecord.question} name='' onChange={(e) => setInputRecord({...inputRecord, question: e.target.value})} />}
                     {qdata.level !== 0 && <input disabled={!inputActive.label} type='text' placeholder={'Insert question'} value={inputRecord.label} name='' onChange={(e) => setInputRecord({...inputRecord, label: e.target.value})} />}                 
                     <div className='commonSpace-buttons'>
@@ -292,6 +292,7 @@ const Question = (qdata) => {
                                                                 setInputRecord({...inputRecord, values: newValues});
                                                             }}
                                                             style={{width: '85%'}}
+                                                            className={!inputActive.values[index] ? 'editValueInput' : 'editValueInputActive'}
                                                         />
                                                         <div className='commonSpace-buttons' style={{width: '10%'}}>
                                                             {nestLevel <= 2 && !question.conditional && (
