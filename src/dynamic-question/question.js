@@ -1,6 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { fieldTypes, yesNoTypes, emptySection } from "./utils.js";
+import { useEffect, useState } from 'preact/hooks';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { fieldTypes, yesNoTypes, emptySection } from './utils.js';
 
 const production = false;
 
@@ -76,7 +76,7 @@ const Question = (qdata) => {
         if (value === 'text') newdq.values = [];
         setQuestionData(newdq);
         questionData.updateFunc(newdq, questionData.position);
-    }
+    };
    
     const addQuestion = (valuePos) => {
         qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: null});
@@ -402,12 +402,13 @@ const Question = (qdata) => {
                                         </>
                                         ))}
                                         {questionData.type === 'multipleother' ? <div className={'evenRow commonSpace'}>
+                                        <div style={{width: '5%'}}><img src={production ? '/static/img/icons/drag-light-gray.svg' : './dynamic-question/assets/drag-light-gray.svg'} /></div>
                                         <input 
                                             disabled={true}
                                             type='text'
-                                            placeholder='Other (Free Text Answer)'
+                                            value='Other (Free Text Answer)'
                                             name='value'
-                                            style={{width: '85%', maxWidth: 'none'}}
+                                            style={{width: '95%', maxWidth: 'none'}}
                                             className={'editValueInput'}
                                         />
                                     </div> : null}
@@ -421,6 +422,7 @@ const Question = (qdata) => {
             {addValueVisible && questionData.type !== 'yesno' && questionData.type !== 'text' ? <div className={'addValueContainer'} style={{width: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <input className='addValueInput' type='text' placeholder='Insert value' value={newValueInput} onChange={(e) => setNewValueInput(e.target.value)} />
                 <button
+                    disabled={!newValueInput.length}
                     className='greyButton'
                     onClick={(e) => {
                         e.preventDefault();

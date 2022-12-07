@@ -1,7 +1,7 @@
 export const fieldTypes = [
     {label: 'Multiple Options', id: 'multiple'},
     {label: 'Multiple Options and Other', id: 'multipleother'},
-    {label: 'Yes / No', id: 'yesno'},
+    {label: 'Yes / No (Radio Button)', id: 'yesno'},
     {label: 'Text Input', id: 'text'},
 ]
 
