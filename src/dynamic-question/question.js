@@ -2,6 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { getUniqueKey } from "./utils.js";
 
+const production = true;
+
 const Question = (qdata) => {
     const nestLevel = qdata.level + 1;
   
@@ -211,7 +213,7 @@ const Question = (qdata) => {
     // END DATA CHANGES LISTENERS
 
     if (newQuestionVisible) return (
-        <div style={qdata.level === 0 ? {maxWidth: '100%', marginBottom: '4px'} : {maxWidth: '100%', marginBottom: '4px', marginLeft: '50px'}}>
+        <div className={'addValueContainer'} style={qdata.level === 0 ? {maxWidth: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'} : {maxWidth: '100%', marginBottom: '4px', marginLeft: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
             <input
                 className='addValueInput'
                 type='text'
@@ -223,10 +225,12 @@ const Question = (qdata) => {
             />
             <button
                 className='greyButton'
-                onClick={() => {
+                onClick={(e) => {
+                    e.preventDefault();
                     if (nestLevel > 1) handleLabel(newQuestionInput);
                     if (nestLevel === 1) handleMainQuestion(newQuestionInput);
                 }}
+                style={{marginTop: '8px'}}
             >Add</button>
         </div>
     )
@@ -238,27 +242,45 @@ const Question = (qdata) => {
                     {qdata.level === 0 && <input disabled={!inputActive.question} type='text' placeholder={'Insert question'} value={inputRecord.question} name='' onChange={(e) => setInputRecord({...inputRecord, question: e.target.value})} />}
                     {qdata.level !== 0 && <input disabled={!inputActive.label} type='text' placeholder={'Insert question'} value={inputRecord.label} name='' onChange={(e) => setInputRecord({...inputRecord, label: e.target.value})} />}                 
                     <div className='commonSpace-buttons'>
-                        {qdata.level === 0 && !inputActive.question && <div className='pointer' onClick={() => toggleActiveInputs('question')}><img src='./dynamic-question/assets/pen-white.svg' /></div>}
-                        {qdata.level === 0 && inputActive.question && <div className='pointer' onClick={() => {
+                        {qdata.level === 0 && !inputActive.question && <div
+                            className='pointer'
+                            onClick={(e) => {
+                            e.preventDefault();
+                            toggleActiveInputs('question');
+                        }}><img src={production ? '/static/img/icons/pen-white.svg' : './dynamic-question/assets/pen-white.svg'} /></div>}
+                        {qdata.level === 0 && inputActive.question && <div className='pointer' onClick={(e) => {
+                            e.preventDefault();
                             handleMainQuestion(inputRecord.question);
                             setInputActive({...inputActive, question: false});
-                        }}><img src='./dynamic-question/assets/save-white.svg' /></div>}
-                        {qdata.level !== 0 && !inputActive.label && <div className='pointer' onClick={() => toggleActiveInputs('label')}><img src='./dynamic-question/assets/pen-white.svg' /></div>}
-                        {qdata.level !== 0 && inputActive.label && <div className='pointer' onClick={() => {
+                        }}><img src={production ? '/static/img/icons/save-white.svg' : './dynamic-question/assets/save-white.svg'} /></div>}
+                        {qdata.level !== 0 && !inputActive.label && <div
+                            className='pointer'
+                            onClick={(e) => {
+                            e.preventDefault();
+                            toggleActiveInputs('label');
+                            }}><img src={production ? '/static/img/icons/pen-white.svg' : './dynamic-question/assets/pen-white.svg'} /></div>}
+                        {qdata.level !== 0 && inputActive.label && <div className='pointer' onClick={(e) => {
+                            e.preventDefault();
                             handleLabel(inputRecord.label);
                             setInputActive({...inputActive, label: false});
-                        }}><img src='./dynamic-question/assets/save-white.svg' /></div>}
+                        }}><img src={production ? '/static/img/icons/save-white.svg' : './dynamic-question/assets/save-white.svg'} /></div>}
                         <div>
                             <img
-                                src='./dynamic-question/assets/icons-white.svg'
-                                onClick={() => {
+                                src={production ? '/static/img/icons/icons-white.svg' : './dynamic-question/assets/icons-white.svg'}
+                                onClick={(e) => {
+                                    e.preventDefault();
                                     qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
                                     questionData.updateFunc(newdq, questionData.position);
                                 }}
                                 style={qdata.state.nestLevelActiveValue === nestLevel ? 'cursor: not-allowed' : ''}
                             />
                         </div>
-                        {qdata.level !== 0 && !inputActive.label && <div className='pointer'  onClick={() => qdata.removeCondition(qdata.position)}><img src='./dynamic-question/assets/trash-white.svg' /></div>}
+                        {qdata.level !== 0 && !inputActive.label && <div
+                            className='pointer'
+                            onClick={(e) => {
+                                e.preventDefault();
+                                qdata.removeCondition(qdata.position)
+                            }}><img src={production ? '/static/img/icons/trash-white.svg' : './dynamic-question/assets/trash-white.svg'} /></div>}
                     </div>
                 </div>
 
@@ -286,7 +308,7 @@ const Question = (qdata) => {
                                                 >
                                                 <div id={index} key={index}>
                                                     <div className={index % 2 === 0 ? 'evenRow commonSpace' : 'oddRow commonSpace'} id={index} key={index}>
-                                                        <div style={{width: '5%'}}><img src='./dynamic-question/assets/drag-grey.svg' /></div>
+                                                        <div style={{width: '5%'}}><img src={production ? '/static/img/icons/drag-grey.svg' : './dynamic-question/assets/drag-grey.svg'} /></div>
                                                         <input 
                                                             disabled={!inputActive.values[index]}
                                                             type='text' placeholder={'Insert value'}
@@ -297,32 +319,44 @@ const Question = (qdata) => {
                                                                 newValues[index] = e.target.value;
                                                                 setInputRecord({...inputRecord, values: newValues});
                                                             }}
-                                                            style={{width: '85%'}}
+                                                            style={{width: '85%', maxWidth: 'none'}}
                                                             className={!inputActive.values[index] ? 'editValueInput' : 'editValueInputActive'}
                                                         />
                                                         <div className='commonSpace-buttons' style={{width: '10%'}}>
                                                             {nestLevel <= 2 && !question.conditional && (
-                                                                <div style={{ marginRight: '3px' }} onClick={() => addQuestion(index)}><img src='./dynamic-question/assets/plus-grey.svg' /></div>
+                                                                <div
+                                                                    style={{ marginRight: '3px' }}
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        addQuestion(index)
+                                                                    }}><img src={production ? '/static/img/icons/plus-grey.svg' : './dynamic-question/assets/plus-grey.svg'} /></div>
                                                             )}
                                                             {!inputActive.values[index] && <div
                                                                 style={{ marginRight: '3px' }}
                                                                 disabled={qdata.state.isEditing}
-                                                                    onClick={() => {
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
                                                                         const newValues = inputActive.values.map(() => false);
                                                                         newValues[index] = true;
                                                                         toggleActiveInputs('values', newValues);
-                                                                    }}><img src='./dynamic-question/assets/pen-grey.svg' />
+                                                                    }}><img src={production ? '/static/img/icons/pen-grey.svg' : './dynamic-question/assets/pen-grey.svg'} />
                                                                 </div>}
                                                             {inputActive.values[index] && <div
                                                                 style={{ marginRight: '3px' }}
-                                                                onClick={() => {
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
                                                                     handleValueLabel(inputRecord.values[index], index);
                                                                     const newValues = [...inputActive.values];
                                                                     newValues[index] = false;
                                                                     setInputActive({...inputActive, values: newValues});
-                                                                }}><img src='./dynamic-question/assets/save-grey.svg' />
+                                                                }}><img src={production ? '/static/img/icons/save-grey.svg' : './dynamic-question/assets/save-grey.svg'} />
                                                             </div>}
-                                                            <div onClick={() => removeValue(index)} style={{ marginRight: '3px' }}><img src='./dynamic-question/assets/trash-grey.svg' /></div>
+                                                            <div
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    removeValue(index)
+                                                                }}
+                                                                style={{ marginRight: '3px' }}><img src={production ? '/static/img/icons/trash-grey.svg' : './dynamic-question/assets/trash-grey.svg'} /></div>
                                                         </div>
                                                     </div>
 
@@ -354,9 +388,15 @@ const Question = (qdata) => {
 
                 </div>
             </div>
-            {addValueVisible && <div style={{width: '100%', marginBottom: '4px'}}>
+            {addValueVisible && <div className={'addValueContainer'} style={{width: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <input className='addValueInput' type='text' placeholder='Insert value' value={newValueInput} onChange={(e) => setNewValueInput(e.target.value)} />
-                <button className='greyButton'  onClick={() => addValue()}>Add</button>
+                <button
+                    className='greyButton'
+                    onClick={(e) => {
+                        e.preventDefault();
+                        addValue()
+                    }}
+                    style={{marginTop: '8px'}} >Add</button>
             </div>}
         </div>
     );

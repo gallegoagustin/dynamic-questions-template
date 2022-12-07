@@ -70,6 +70,10 @@
 	background-color: #D3D3D3;
 }
 
+#crt .dynamicInputHide {
+	display: none !important;
+}
+
 /* Fields */
 #crt input {
 	margin: 0px 3px;
@@ -215,6 +219,7 @@
 #crt .addValueInput {
 	margin-top: 8px;
 	width: 90%;
+	max-width: none;
 	border: 1px solid #e1dce2;
 	border-radius: 0;
 }

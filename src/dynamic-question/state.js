@@ -1,4 +1,4 @@
-import { emptySection } from "./utils.js";
+import { emptySection } from './utils.js';
 
 export const initialState = {
     data: [{...emptySection}],
@@ -44,6 +44,11 @@ export const reducer = (state, action) => {
         return {
             ...state,
             nestLevelActiveValue: action.payload,
+        };
+    case 'ADD_LABEL':
+        return {
+            ...state,
+            data: [{...state.data[0], label: action.payload}],
         };
     default: 
         return state;

@@ -4,7 +4,7 @@ import { reducer, initialState } from "./state.js";
 import Question from './question.js';
 import './index.css';
 
-const DynamicQuestion = () => {
+const DynamicQuestion = ({url, label, token}) => {
     const nestLevel = 0;
   
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -21,6 +21,24 @@ const DynamicQuestion = () => {
             data,
             index,
         } });
+    };
+
+    const handleSaveEvent = async () => {
+        const endpoint = url.includes('localhost') ? `http://${url}` : `https://${url}`;
+        const formData = new FormData();
+        const bodyData = {...state.data[0], label: label};
+        delete bodyData.state;
+        formData.append('json_object', JSON.stringify(bodyData));
+        formData.append('name', label);
+        formData.append('item_type', 'question');
+        const response = await fetch(endpoint, {
+            method: 'PUT',
+            headers: {
+                'X-CSRFToken': token
+            },
+            body: formData,
+        });
+        console.log('SAVE EVENT RESULT: ', response);
     };
   
     useEffect(() => {
@@ -44,7 +62,14 @@ const DynamicQuestion = () => {
                 />
             ))}
             <div className='bottomButtonsContainer'>
-                <button id='crtJson' style={{visibility: 'hidden'}} onClick={() => console.log('JSON RESULT:', state.data[0])}>Save</button>
+                <button
+                    class='crtJson'
+                    style={{visibility: 'hidden'}}
+                    onClick={async (e) => {
+                        e.preventDefault();
+                        await handleSaveEvent();
+                    }}
+                >Save</button>
             </div>
         </div>
     );
