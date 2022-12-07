@@ -21,12 +21,12 @@ export const yesNoTypes = [
 ]
 
 export const getUniqueKey = (initializer) => {
-    const randomNumber = Math.round(Math.random() * 100000);
-    return `${initializer}-${randomNumber}`;
+    const randomNumber = Math.round(Math.random() * 500000);
+    return `${randomNumber}`;
 };
   
 export const emptySection = {
-    id: getUniqueKey(0),
+    id: getUniqueKey(),
     label: '',
     question: '',
     type: 'multiple',

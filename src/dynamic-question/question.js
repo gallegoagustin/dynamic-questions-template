@@ -1,6 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { getUniqueKey, fieldTypes, yesNoTypes, emptySection } from "./utils.js";
+import { fieldTypes, yesNoTypes, emptySection } from "./utils.js";
 
 const production = false;
 
