@@ -74,6 +74,18 @@
 	display: none !important;
 }
 
+#crt .fieldTypeSelection {
+	background-color: transparent;
+	border: 1px solid #FFFFFF;
+	color: #FFFFFF;
+	width: 200px;
+	text-align: left;
+}
+
+#crt .fieldTypeSelection:hover {
+	border: 1px solid #FFFFFF;
+}
+
 /* Fields */
 #crt input {
 	margin: 0px 3px;

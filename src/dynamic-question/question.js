@@ -1,8 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { getUniqueKey } from "./utils.js";
+import { getUniqueKey, fieldTypes, yesNoTypes, emptySection } from "./utils.js";
 
-const production = true;
+const production = false;
 
 const Question = (qdata) => {
     const nestLevel = qdata.level + 1;
@@ -69,6 +69,14 @@ const Question = (qdata) => {
             break;
         }
     };
+
+    const handleFieldTypeChange = (value) => {
+        const newdq = {...questionData, type: value};
+        if (value === 'yesno') newdq.values = [...yesNoTypes];
+        if (value === 'text') newdq.values = [];
+        setQuestionData(newdq);
+        questionData.updateFunc(newdq, questionData.position);
+    }
    
     const addQuestion = (valuePos) => {
         qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: null});
@@ -76,12 +84,7 @@ const Question = (qdata) => {
         newdq.values[valuePos] = {
             ...newdq.values[valuePos],
             conditional: true,
-            question: {
-                id: getUniqueKey(nestLevel),
-                label: '',
-                type: 'multiple',
-                values: []
-            }
+            question: {...emptySection}
         };
         setQuestionData(newdq);
         setInputRecord({...inputRecord, values: newdq.values.map(item => item.value)});
@@ -242,6 +245,15 @@ const Question = (qdata) => {
                     {qdata.level === 0 && <input disabled={!inputActive.question} type='text' placeholder={'Insert question'} value={inputRecord.question} name='' onChange={(e) => setInputRecord({...inputRecord, question: e.target.value})} />}
                     {qdata.level !== 0 && <input disabled={!inputActive.label} type='text' placeholder={'Insert question'} value={inputRecord.label} name='' onChange={(e) => setInputRecord({...inputRecord, label: e.target.value})} />}                 
                     <div className='commonSpace-buttons'>
+                        <select
+                            className='fieldTypeSelection'
+                            onChange={(e) => {
+                                e.preventDefault();
+                                handleFieldTypeChange(e.target.value);
+                            }}
+                        >
+                            {fieldTypes.map(el => (<option selected={el.id === questionData.type} value={el.id}>{el.label}</option>))}
+                        </select>
                         {qdata.level === 0 && !inputActive.question && <div
                             className='pointer'
                             onClick={(e) => {
@@ -264,7 +276,7 @@ const Question = (qdata) => {
                             handleLabel(inputRecord.label);
                             setInputActive({...inputActive, label: false});
                         }}><img src={production ? '/static/img/icons/save-white.svg' : './dynamic-question/assets/save-white.svg'} /></div>}
-                        <div>
+                        {questionData.type !== 'yesno' && questionData.type !== 'text' ? <div>
                             <img
                                 src={production ? '/static/img/icons/icons-white.svg' : './dynamic-question/assets/icons-white.svg'}
                                 onClick={(e) => {
@@ -274,7 +286,7 @@ const Question = (qdata) => {
                                 }}
                                 style={qdata.state.nestLevelActiveValue === nestLevel ? 'cursor: not-allowed' : ''}
                             />
-                        </div>
+                        </div> : null}
                         {qdata.level !== 0 && !inputActive.label && <div
                             className='pointer'
                             onClick={(e) => {
@@ -293,6 +305,16 @@ const Question = (qdata) => {
                                     ref={provided.innerRef}
                                     style={getListStyle(snapshot.isDraggingOver)}
                                 >
+                                    {questionData.type === 'text' ? <div className={'evenRow commonSpace'}>
+                                        <input 
+                                            disabled={true}
+                                            type='text'
+                                            placeholder='Free Text Answer'
+                                            name='value'
+                                            style={{width: '85%', maxWidth: 'none'}}
+                                            className={'editValueInput'}
+                                        />
+                                    </div> : null}
                                     {questionData.values.map((question, index) => (
                                         <>
                                         <Draggable key={index} draggableId={`${question.order}`} index={index}>
@@ -359,7 +381,6 @@ const Question = (qdata) => {
                                                                 style={{ marginRight: '3px' }}><img src={production ? '/static/img/icons/trash-grey.svg' : './dynamic-question/assets/trash-grey.svg'} /></div>
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                             )}
@@ -380,7 +401,16 @@ const Question = (qdata) => {
                                         </div>
                                         </>
                                         ))}
-                                        
+                                        {questionData.type === 'multipleother' ? <div className={'evenRow commonSpace'}>
+                                        <input 
+                                            disabled={true}
+                                            type='text'
+                                            placeholder='Other (Free Text Answer)'
+                                            name='value'
+                                            style={{width: '85%', maxWidth: 'none'}}
+                                            className={'editValueInput'}
+                                        />
+                                    </div> : null}
                                     </div>
                                 )}
                         </Droppable>
@@ -388,7 +418,7 @@ const Question = (qdata) => {
 
                 </div>
             </div>
-            {addValueVisible && <div className={'addValueContainer'} style={{width: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            {addValueVisible && questionData.type !== 'yesno' && questionData.type !== 'text' ? <div className={'addValueContainer'} style={{width: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <input className='addValueInput' type='text' placeholder='Insert value' value={newValueInput} onChange={(e) => setNewValueInput(e.target.value)} />
                 <button
                     className='greyButton'
@@ -397,7 +427,7 @@ const Question = (qdata) => {
                         addValue()
                     }}
                     style={{marginTop: '8px'}} >Add</button>
-            </div>}
+            </div> : null}
         </div>
     );
 };
