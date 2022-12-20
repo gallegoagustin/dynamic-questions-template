@@ -4,7 +4,7 @@ import { reducer, initialState } from "./state.js";
 import Question from './question.js';
 import './index.css';
 
-const DynamicQuestion = ({url, label, token}) => {
+const DynamicQuestion = ({webjson, url, label, token}) => {
     const nestLevel = 0;
   
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -21,16 +21,53 @@ const DynamicQuestion = ({url, label, token}) => {
             data,
             index,
         } });
+        dispatch({ type: 'HAS_CHANGES' });
     };
 
     const handleSaveEvent = async () => {
+        if (!state.hasChanges) return;
+
         const endpoint = url.includes('localhost') ? `http://${url}` : `https://${url}`;
-        const formData = new FormData();
-        const bodyData = {...state.data[0], label: label};
-        delete bodyData.state;
-        formData.append('json_object', JSON.stringify(bodyData));
-        formData.append('name', label);
-        formData.append('item_type', 'question');
+
+        const handleStateKeys = (arr) => {
+            const newArr = [...arr];
+            for (let i = 0; i < newArr.length; i++) {
+                if (newArr[i].question !== null) {
+                    const arrKeys = Object.keys(newArr[i].question);
+                    if (arrKeys.includes('state')) {
+                        delete newArr[i].question['state'];
+                    }
+                    if (newArr[i].question.values.length) {
+                        const newValues = handleStateKeys(newArr[i].question.values);
+                        newArr[i].question.values = newValues;
+                    }
+                }
+            }
+            return newArr;
+        };
+
+        const body = {
+            'name': label,
+            'item_type': 'question',
+            'json_object': {
+                id: state.data[0].id,
+                label: label,
+                question: state.data[0].question,
+                type: state.data[0].type,
+                values: state.data[0].values,
+                answer: state.data[0].answer,
+            }
+        };
+
+        const newArray = handleStateKeys(body.json_object.values);
+        body.json_object.values = newArray;
+    
+        var formData = new FormData();
+
+        formData.append('name', body['name']);
+        formData.append('item_type', body['item_type']);
+        formData.append('json_object', JSON.stringify(body['json_object']));
+
         const response = await fetch(endpoint, {
             method: 'PUT',
             headers: {
@@ -40,6 +77,15 @@ const DynamicQuestion = ({url, label, token}) => {
         });
         console.log('SAVE EVENT RESULT: ', response);
     };
+
+    useEffect(() => {
+        if (webjson) {
+            dispatch({ type: 'UPDATE_STATE', payload: {
+                data: JSON.parse(webjson),
+                index: 0,
+            } });
+        }
+    }, []);
   
     useEffect(() => {
         setJson(state.data);

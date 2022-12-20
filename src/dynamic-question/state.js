@@ -4,6 +4,7 @@ export const initialState = {
     data: [{...emptySection}],
     isEditing: false,
     nestLevelActiveValue: 1,
+    hasChanges: false,
 };
   
 export const reducer = (state, action) => {
@@ -49,6 +50,11 @@ export const reducer = (state, action) => {
         return {
             ...state,
             data: [{...state.data[0], label: action.payload}],
+        };
+    case 'HAS_CHANGES':
+        return {
+            ...state,
+            hasChanges: true,
         };
     default: 
         return state;
