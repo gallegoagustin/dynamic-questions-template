@@ -4,7 +4,7 @@ import { reducer, initialState } from "./state.js";
 import Question from './question.js';
 import './index.css';
 
-const DynamicQuestion = ({webjson, url, label, token}) => {
+const DynamicQuestion = ({webjson, url, label, reload, token}) => {
     const nestLevel = 0;
   
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -15,7 +15,7 @@ const DynamicQuestion = ({webjson, url, label, token}) => {
     const handleDeleteSection = (index) => {
         dispatch({ type: 'DELETE_SECTION', payload: index });
     };
-  
+
     const onUpdateDispatch = (data, index) => {
         dispatch({ type: 'UPDATE_STATE', payload: {
             data,
@@ -61,7 +61,7 @@ const DynamicQuestion = ({webjson, url, label, token}) => {
 
         const newArray = handleStateKeys(body.json_object.values);
         body.json_object.values = newArray;
-    
+
         var formData = new FormData();
 
         formData.append('name', body['name']);
@@ -75,7 +75,6 @@ const DynamicQuestion = ({webjson, url, label, token}) => {
             },
             body: formData,
         });
-        console.log('SAVE EVENT RESULT: ', response);
     };
 
     useEffect(() => {
@@ -86,13 +85,13 @@ const DynamicQuestion = ({webjson, url, label, token}) => {
             } });
         }
     }, []);
-  
+
     useEffect(() => {
         setJson(state.data);
         setCounter(counter + 1);
         dispatch({ type: 'IS_NOT_EDITING' });
     }, [state.data, initialState]);
-  
+
     return (
         <div id='crt'>
             {json && json.map((dynamicQuestion, index) => (
@@ -114,6 +113,7 @@ const DynamicQuestion = ({webjson, url, label, token}) => {
                     onClick={async (e) => {
                         e.preventDefault();
                         await handleSaveEvent();
+                        if(reload) window.location.href = reload;
                     }}
                 >Save</button>
             </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { fieldTypes, yesNoTypes, emptySection } from './utils.js';
+import { fieldTypes, yesNoTypes, yesNoNaTypes, emptySection } from './utils.js';
 
 const production = false;
 
@@ -73,7 +73,15 @@ const Question = (qdata) => {
     const handleFieldTypeChange = (value) => {
         const newdq = {...questionData, type: value};
         if (value === 'yesno') newdq.values = [...yesNoTypes];
+        if (value === 'yesnona') newdq.values = [...yesNoNaTypes];
         if (value === 'text') newdq.values = [];
+        setQuestionData(newdq);
+        questionData.updateFunc(newdq, questionData.position);
+    };
+
+    const handleGalleryChange = (value) => {
+        const newdq = {...questionData};
+        newdq.has_gallery = value;
         setQuestionData(newdq);
         questionData.updateFunc(newdq, questionData.position);
     };
@@ -116,7 +124,7 @@ const Question = (qdata) => {
             ]
         };
         setQuestionData(newData);
-        qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel})
+        qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
         questionData.updateFunc(newData, newData.position);
     };
   
@@ -145,14 +153,14 @@ const Question = (qdata) => {
     const handleLabel = (value) => {
         const newData = {...questionData, label: value};
         setQuestionData(newData);
-        qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel})
+        qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
         questionData.updateFunc(newData, questionData.position);
     };
   
     const handleMainQuestion = (value) => {
         const newData = {...questionData, question: value};
         setQuestionData(newData);
-        qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel})
+        qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
         questionData.updateFunc(newData, questionData.position);
     };
   
@@ -178,26 +186,26 @@ const Question = (qdata) => {
 
     const onDragEnd = (result) => {
         if (!result.destination) {
-          return;
+            return;
         }
     
         const newValues = reorder(
-          questionData.values,
-          result.source.index,
-          result.destination.index
+            questionData.values,
+            result.source.index,
+            result.destination.index
         );
     
         const newData = {...questionData, values: newValues};
         setQuestionData(newData);
         questionData.updateFunc(newData, questionData.position);
-      }
+    };
 
-      const getItemStyle = (isDragging, draggableStyle) => ({
+    const getItemStyle = (isDragging, draggableStyle) => ({
         cursor: 'pointer',
         ...draggableStyle
-      });
+    });
       
-      const getListStyle = isDraggingOver => ({});
+    const getListStyle = isDraggingOver => ({});
     // END DRAG & DROP FUNCTIONS
 
     // START DATA CHANGES LISTENERS
@@ -207,12 +215,12 @@ const Question = (qdata) => {
         } else {
             setAddValueVisible(false);
         }
-    }, [qdata.state.nestLevelActiveValue])
+    }, [qdata.state.nestLevelActiveValue]);
 
     useEffect(() => {
         if (nestLevel > 1 && questionData.label.length > 0) setNewQuestionVisible(false);
         if (nestLevel === 1 && questionData.question.length > 0) setNewQuestionVisible(false);
-    }, [questionData.label])
+    }, [questionData.label]);
     // END DATA CHANGES LISTENERS
 
     if (newQuestionVisible) return (
@@ -236,7 +244,7 @@ const Question = (qdata) => {
                 style={{marginTop: '8px'}}
             >Add</button>
         </div>
-    )
+    );
   
     return (
         <div className={qdata.level === 0 ? 'containerQuestion' : 'captionQuestion'}>
@@ -246,7 +254,7 @@ const Question = (qdata) => {
                     {qdata.level !== 0 && <input disabled={!inputActive.label} type='text' placeholder={'Insert question'} value={inputRecord.label} name='' onChange={(e) => setInputRecord({...inputRecord, label: e.target.value})} />}                 
                     <div className='commonSpace-buttons'>
                         <select
-                            className='fieldTypeSelection'
+                            className='fieldTypeSelection no-default-select2'
                             onChange={(e) => {
                                 e.preventDefault();
                                 handleFieldTypeChange(e.target.value);
@@ -257,9 +265,9 @@ const Question = (qdata) => {
                         {qdata.level === 0 && !inputActive.question && <div
                             className='pointer'
                             onClick={(e) => {
-                            e.preventDefault();
-                            toggleActiveInputs('question');
-                        }}><img src={production ? '/static/img/icons/pen-white.svg' : './dynamic-question/assets/pen-white.svg'} /></div>}
+                                e.preventDefault();
+                                toggleActiveInputs('question');
+                            }}><img src={production ? '/static/img/icons/pen-white.svg' : './dynamic-question/assets/pen-white.svg'} /></div>}
                         {qdata.level === 0 && inputActive.question && <div className='pointer' onClick={(e) => {
                             e.preventDefault();
                             handleMainQuestion(inputRecord.question);
@@ -268,17 +276,17 @@ const Question = (qdata) => {
                         {qdata.level !== 0 && !inputActive.label && <div
                             className='pointer'
                             onClick={(e) => {
-                            e.preventDefault();
-                            toggleActiveInputs('label');
+                                e.preventDefault();
+                                toggleActiveInputs('label');
                             }}><img src={production ? '/static/img/icons/pen-white.svg' : './dynamic-question/assets/pen-white.svg'} /></div>}
                         {qdata.level !== 0 && inputActive.label && <div className='pointer' onClick={(e) => {
                             e.preventDefault();
                             handleLabel(inputRecord.label);
                             setInputActive({...inputActive, label: false});
                         }}><img src={production ? '/static/img/icons/save-white.svg' : './dynamic-question/assets/save-white.svg'} /></div>}
-                        {questionData.type !== 'yesno' && questionData.type !== 'text' ? <div>
+                        {questionData.type !== 'yesno' && questionData.type !== 'yesnona' && questionData.type !== 'text' ? <div>
                             <img
-                                src={production ? '/static/img/icons/icons-white.svg' : './dynamic-question/assets/icons-white.svg'}
+                                src={production ? '/static/img/icons/plus-white.svg' : './dynamic-question/assets/plus-white.svg'}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     qdata.dispatch({type: 'SET_NEST_VALUE_ACTIVE', payload: nestLevel});
@@ -291,8 +299,16 @@ const Question = (qdata) => {
                             className='pointer'
                             onClick={(e) => {
                                 e.preventDefault();
-                                qdata.removeCondition(qdata.position)
+                                qdata.removeCondition(qdata.position);
                             }}><img src={production ? '/static/img/icons/trash-white.svg' : './dynamic-question/assets/trash-white.svg'} /></div>}
+                        {/* <div
+                            style={{width: '20px', height: '20px', backgroundColor: '#FFF', borderRadius: '50%'}}
+                            onClick={() => {
+                                const newValue = questionData.has_gallery ? false : true;
+                                handleGalleryChange(newValue);
+                            }}
+                        ></div> */}
+                        {qdata.level === 0 && <div style={{width: '32px'}}></div>}
                     </div>
                 </div>
 
@@ -309,124 +325,126 @@ const Question = (qdata) => {
                                         <input 
                                             disabled={true}
                                             type='text'
-                                            placeholder='Free Text Answer'
+                                            placeholder='Free Text'
                                             name='value'
                                             style={{width: '85%', maxWidth: 'none'}}
                                             className={'editValueInput'}
+                                            maxLength={500}
                                         />
                                     </div> : null}
                                     {questionData.values.map((question, index) => (
                                         <>
-                                        <Draggable key={index} draggableId={`${question.order}`} index={index}>
-                                            {(provided, snapshot) => (
-                                                <div
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                ref={provided.innerRef}
-                                                style={getItemStyle(
-                                                    snapshot.isDragging,
-                                                    provided.draggableProps.style
-                                                )}
-                                                >
-                                                <div id={index} key={index}>
-                                                    <div className={index % 2 === 0 ? 'evenRow commonSpace' : 'oddRow commonSpace'} id={index} key={index}>
-                                                        <div style={{width: '5%'}}><img src={production ? '/static/img/icons/drag-grey.svg' : './dynamic-question/assets/drag-grey.svg'} /></div>
-                                                        <input 
-                                                            disabled={!inputActive.values[index]}
-                                                            type='text' placeholder={'Insert value'}
-                                                            value={inputRecord.values[index]}
-                                                            name='value'
-                                                            onChange={(e) => {
-                                                                const newValues = [...inputRecord.values];
-                                                                newValues[index] = e.target.value;
-                                                                setInputRecord({...inputRecord, values: newValues});
-                                                            }}
-                                                            style={{width: '85%', maxWidth: 'none'}}
-                                                            className={!inputActive.values[index] ? 'editValueInput' : 'editValueInputActive'}
-                                                        />
-                                                        <div className='commonSpace-buttons' style={{width: '10%'}}>
-                                                            {nestLevel <= 2 && !question.conditional && (
-                                                                <div
-                                                                    style={{ marginRight: '3px' }}
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        addQuestion(index)
-                                                                    }}><img src={production ? '/static/img/icons/plus-grey.svg' : './dynamic-question/assets/plus-grey.svg'} /></div>
-                                                            )}
-                                                            {!inputActive.values[index] && <div
-                                                                style={{ marginRight: '3px' }}
-                                                                disabled={qdata.state.isEditing}
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        const newValues = inputActive.values.map(() => false);
-                                                                        newValues[index] = true;
-                                                                        toggleActiveInputs('values', newValues);
-                                                                    }}><img src={production ? '/static/img/icons/pen-grey.svg' : './dynamic-question/assets/pen-grey.svg'} />
-                                                                </div>}
-                                                            {inputActive.values[index] && <div
-                                                                style={{ marginRight: '3px' }}
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    handleValueLabel(inputRecord.values[index], index);
-                                                                    const newValues = [...inputActive.values];
-                                                                    newValues[index] = false;
-                                                                    setInputActive({...inputActive, values: newValues});
-                                                                }}><img src={production ? '/static/img/icons/save-grey.svg' : './dynamic-question/assets/save-grey.svg'} />
-                                                            </div>}
-                                                            <div
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    removeValue(index)
-                                                                }}
-                                                                style={{ marginRight: '3px' }}><img src={production ? '/static/img/icons/trash-grey.svg' : './dynamic-question/assets/trash-grey.svg'} /></div>
+                                            <Draggable key={index} draggableId={`${question.order}`} index={index}>
+                                                {(provided, snapshot) => (
+                                                    <div
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                        ref={provided.innerRef}
+                                                        style={getItemStyle(
+                                                            snapshot.isDragging,
+                                                            provided.draggableProps.style
+                                                        )}
+                                                    >
+                                                        <div id={index} key={index}>
+                                                            <div className={index % 2 === 0 ? 'evenRow commonSpace' : 'oddRow commonSpace'} id={index} key={index}>
+                                                                <div style={{width: '5%'}}><img src={production ? '/static/img/icons/drag-grey.svg' : './dynamic-question/assets/drag-grey.svg'} /></div>
+                                                                <input 
+                                                                    disabled={!inputActive.values[index]}
+                                                                    type='text' placeholder={'Insert value'}
+                                                                    value={inputRecord.values[index]}
+                                                                    name='value'
+                                                                    onChange={(e) => {
+                                                                        const newValues = [...inputRecord.values];
+                                                                        newValues[index] = e.target.value;
+                                                                        setInputRecord({...inputRecord, values: newValues});
+                                                                    }}
+                                                                    style={{width: '85%', maxWidth: 'none'}}
+                                                                    className={!inputActive.values[index] ? 'editValueInput' : 'editValueInputActive'}
+                                                                />
+                                                                <div className='commonSpace-buttons' style={{width: '10%'}}>
+                                                                    {nestLevel <= 2 && !question.conditional && (
+                                                                        <div
+                                                                            style={{ marginRight: '3px' }}
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                addQuestion(index);
+                                                                            }}><img src={production ? '/static/img/icons/plus-grey.svg' : './dynamic-question/assets/plus-grey.svg'} /></div>
+                                                                    )}
+                                                                    {!inputActive.values[index] && <div
+                                                                        style={{ marginRight: '3px' }}
+                                                                        disabled={qdata.state.isEditing}
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            const newValues = inputActive.values.map(() => false);
+                                                                            newValues[index] = true;
+                                                                            toggleActiveInputs('values', newValues);
+                                                                        }}><img src={production ? '/static/img/icons/pen-grey.svg' : './dynamic-question/assets/pen-grey.svg'} />
+                                                                    </div>}
+                                                                    {inputActive.values[index] && <div
+                                                                        style={{ marginRight: '3px' }}
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            handleValueLabel(inputRecord.values[index], index);
+                                                                            const newValues = [...inputActive.values];
+                                                                            newValues[index] = false;
+                                                                            setInputActive({...inputActive, values: newValues});
+                                                                        }}><img src={production ? '/static/img/icons/save-grey.svg' : './dynamic-question/assets/save-grey.svg'} />
+                                                                    </div>}
+                                                                    <div
+                                                                        onClick={(e) => {
+                                                                            e.preventDefault();
+                                                                            removeValue(index);
+                                                                        }}
+                                                                        style={{ marginRight: '3px' }}><img src={production ? '/static/img/icons/trash-grey.svg' : './dynamic-question/assets/trash-grey.svg'} /></div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                )}
+                                            </Draggable>
+                                            <div>
+                                                {question.conditional && (
+                                                    <Question
+                                                        key={`${index}-${nestLevel}`}
+                                                        {...question.question}
+                                                        position={index}
+                                                        updateFunc={onUpdateDispatch}
+                                                        level={nestLevel}
+                                                        state={qdata.state}
+                                                        dispatch={qdata.dispatch}
+                                                        removeCondition={removeCondition}
+                                                    />
+                                                )}
                                             </div>
-                                            )}
-                                        </Draggable>
-                                        <div>
-                                            {question.conditional && (
-                                                <Question
-                                                    key={`${index}-${nestLevel}`}
-                                                    {...question.question}
-                                                    position={index}
-                                                    updateFunc={onUpdateDispatch}
-                                                    level={nestLevel}
-                                                    state={qdata.state}
-                                                    dispatch={qdata.dispatch}
-                                                    removeCondition={removeCondition}
-                                                />
-                                            )}
-                                        </div>
                                         </>
-                                        ))}
-                                        {questionData.type === 'multipleother' ? <div className={'evenRow commonSpace'}>
+                                    ))}
+                                    {questionData.type === 'multipleother' ? <div className={'evenRow commonSpace'}>
                                         <div style={{width: '5%'}}><img src={production ? '/static/img/icons/drag-light-gray.svg' : './dynamic-question/assets/drag-light-gray.svg'} /></div>
                                         <input 
                                             disabled={true}
                                             type='text'
-                                            value='Other (Free Text Answer)'
+                                            value='Free Text'
                                             name='value'
                                             style={{width: '95%', maxWidth: 'none'}}
                                             className={'editValueInput'}
+                                            maxLength={500}
                                         />
                                     </div> : null}
-                                    </div>
-                                )}
+                                </div>
+                            )}
                         </Droppable>
                     </DragDropContext>
 
                 </div>
             </div>
-            {addValueVisible && questionData.type !== 'yesno' && questionData.type !== 'text' ? <div className={'addValueContainer'} style={{width: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            {addValueVisible && questionData.type !== 'yesno' && questionData.type !== 'yesnona' && questionData.type !== 'text' ? <div className={'addValueContainer'} style={{width: '100%', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <input className='addValueInput' type='text' placeholder='Insert value' value={newValueInput} onChange={(e) => setNewValueInput(e.target.value)} />
                 <button
                     disabled={!newValueInput.length}
                     className='greyButton'
                     onClick={(e) => {
                         e.preventDefault();
-                        addValue()
+                        addValue();
                     }}
                     style={{marginTop: '8px'}} >Add</button>
             </div> : null}
