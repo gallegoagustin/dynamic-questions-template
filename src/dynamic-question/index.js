@@ -78,7 +78,7 @@ const DynamicQuestion = ({webjson, url, label, reload, token}) => {
     };
 
     useEffect(() => {
-        if (webjson) {
+        if (webjson && webjson != null) {
             dispatch({ type: 'UPDATE_STATE', payload: {
                 data: JSON.parse(webjson),
                 index: 0,
